@@ -1,0 +1,49 @@
+---
+title: "Beachhead Approach: Federal Cyber/Preparedness Contract Spending"
+author: "Mark Hamer"
+format: "html"
+editor: "visual"
+---
+## Overview
+
+This project uses federal contract award data from USAspending.gov to explore government spending related to cybersecurity, infrastructure, and preparedness. I downloaded the “Prime Award Summaries (Contracts)” dataset, which summarizes each contract award with information like agency, fiscal year, award amount, recipient, and a short description. Source: https://www.usaspending.gov/
+
+## Data Source
+
+The dataset used in this project comes from USASpending.gov and was accessed via a publicly available CSV file hosted on GitHub. Each row represents a federal prime contract award and includes information such as the awarding agency, recipient, fiscal year, and obligated amount. The data allows for an initial exploration of how federal cyber and preparedness-related funding is distributed across agencies.
+
+## Data Selection and Subset
+
+Each row in the dataset represents a single prime federal contract
+award. For this initial analysis, I'll keep all available rows
+to preserve the full scope of federal cybersecurity and preparedness
+spending.
+
+I subset the data to a small set of interpretable columns that capture who awarded the contract, when it was awarded, who received it, how much funding was obligated, and a short text description of the contract’s purpose.
+
+
+contracts_subset <- contracts_raw %>%
+  select(
+    awarding_agency_name,
+    parent_award_agency_name,
+    fiscal_year,
+    recipient_name,
+    total_obligated_amount,
+    award_description
+  )
+
+dim(contracts_subset)
+head(contracts_subset)
+
+
+```{r}
+library(tidyverse)
+
+
+url <- "https://raw.githubusercontent.com/dataworkslabs/cyber-funding/refs/heads/main/Contracts_PrimeAwardSummaries_2026-01-29_H22M35S35_1.csv"
+
+```{r}
+contracts_raw <- read_csv(url)
+dim(contracts_raw)
+head(contracts_raw)
+```
