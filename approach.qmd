@@ -1,49 +1,71 @@
 ---
-title: "Beachhead Approach: Federal Cyber/Preparedness Contract Spending"
+title: "Code Base: Federal Cyber/Preparedness Contract Spending"
 author: "Mark Hamer"
 format: "html"
-editor: "visual"
+editor: source
+
 ---
+## Introduction
+
+This analysis examines federal cybersecurity and preparedness-related contract spending to understand how different administrations prioritized cybersecurity.
+
 ## Overview
 
-This project uses federal contract award data from USAspending.gov to explore government spending related to cybersecurity, infrastructure, and preparedness. I downloaded the “Prime Award Summaries (Contracts)” dataset, which summarizes each contract award with information like agency, fiscal year, award amount, recipient, and a short description. Source: https://www.usaspending.gov/
+This analysis explores federal contract spending related to cybersecurity and preparedness using USAspending.gov contract award data. The goal is to understand which agencies receive the largest share of funding and how spending has evolved across fiscal years. This serves as an initial exploratory step toward comparing federal priorities over time.
 
 ## Data Source
 
-The dataset used in this project comes from USASpending.gov and was accessed via a publicly available CSV file hosted on GitHub. Each row represents a federal prime contract award and includes information such as the awarding agency, recipient, fiscal year, and obligated amount. The data allows for an initial exploration of how federal cyber and preparedness-related funding is distributed across agencies.
+The dataset contains over 800 federal prime contract awards with hundreds of variables. To make the analysis interpretable, I subset the data to a small number of columns capturing the awarding agency, fiscal year, recipient, obligated amount, and contract description.
 
-## Data Selection and Subset
+## Data Selection, Subset, and Motivation
 
-Each row in the dataset represents a single prime federal contract
-award. For this initial analysis, I'll keep all available rows
-to preserve the full scope of federal cybersecurity and preparedness
-spending.
+Each row in the dataset represents a single prime federal contract award.  
+For this analysis, I keep all rows, but subset to a small set of columns to focus on:
 
-I subset the data to a small set of interpretable columns that capture who awarded the contract, when it was awarded, who received it, how much funding was obligated, and a short text description of the contract’s purpose.
+- where the money came from (awarding agency)
+- where the money went (recipient)
+- fiscal year
+- total obligated amount
+- award description
 
+## Data Cleaning and Subsetting
+
+This code loads the dataset from GitHub, keeps only five interpretable columns,
+creates a year field from the award date, and outputs a cleaned dataset.
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+library(tidyverse)
+
+url <- "https://raw.githubusercontent.com/dataworkslabs/cyber-funding/refs/heads/main/Contracts_PrimeAwardSummaries_2026-01-29_H22M35S35_1.csv"
+contracts_raw <- read_csv(url, show_col_types = FALSE)
 
 contracts_subset <- contracts_raw %>%
   select(
     awarding_agency_name,
-    parent_award_agency_name,
-    fiscal_year,
     recipient_name,
-    total_obligated_amount,
-    award_description
+    award_base_action_date,
+    total_obligated_amount
+  ) %>%
+  rename(
+    awarding_agency = awarding_agency_name,
+    recipient = recipient_name,
+    award_date = award_base_action_date,
+    total_amount = total_obligated_amount
   )
 
-dim(contracts_subset)
-head(contracts_subset)
+# Preview in the rendered HTML
+head(contracts_subset, 10)
 
-
-```{r}
-library(tidyverse)
-
-
-url <- "https://raw.githubusercontent.com/dataworkslabs/cyber-funding/refs/heads/main/Contracts_PrimeAwardSummaries_2026-01-29_H22M35S35_1.csv"
-
-```{r}
-contracts_raw <- read_csv(url)
-dim(contracts_raw)
-head(contracts_raw)
+# Save cleaned data as a CSV in your project folder
+write_csv(contracts_subset, "contracts_subset.csv")
 ```
+
+## Conclusions / Next Steps
+
+In a future iteration, I would (1) verify which awards are truly cyber/preparedness-related by filtering on keywords in the description, (2) summarize spending by year and agency, and (3) compare trends across administrations by grouping years into administration periods and checking whether patterns persist when using obligated vs outlayed amounts.
+
+
